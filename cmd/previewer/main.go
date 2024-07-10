@@ -4,18 +4,18 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	lrucache "github.com/Lanworm/image-previewe/internal/cache"
-	"github.com/Lanworm/image-previewe/internal/service"
-	"github.com/Lanworm/image-previewe/internal/storage/filestorage"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	lrucache "github.com/Lanworm/image-previewe/internal/cache"
 	"github.com/Lanworm/image-previewe/internal/config"
 	"github.com/Lanworm/image-previewe/internal/http/server"
 	"github.com/Lanworm/image-previewe/internal/http/server/httphandler"
 	"github.com/Lanworm/image-previewe/internal/logger"
+	"github.com/Lanworm/image-previewe/internal/service"
+	"github.com/Lanworm/image-previewe/internal/storage/filestorage"
 	"github.com/Lanworm/image-previewe/pkg/shortcuts"
 )
 
@@ -39,7 +39,7 @@ func main() {
 	logg, err := logger.New(configs.Logger.Level, os.Stdout)
 	shortcuts.FatalIfErr(err)
 	cache := lrucache.NewCache(configs.Cache.Capacity)
-	lrucache.InitCache(configs.Storage.Path, configs.Cache.Capacity, cache)
+	lrucache.InitCache(configs.Storage.Path, cache)
 	storage := filestorage.NewFileStorage(configs.Storage.Path)
 	imgService := service.NewImageService(logg, storage, cache)
 	ctx, cancel := signal.NotifyContext(context.Background(),

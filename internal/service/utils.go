@@ -1,7 +1,7 @@
 package service
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"net/url"
@@ -32,7 +32,7 @@ func PrepareImgParams(u *url.URL) (imgParams *ImgParams, err error) {
 	imageURL := strings.Join(imageURLParts, "/")
 
 	// Удаляем "https/" из URL, если присутствует
-	imageURL = strings.Replace(imageURL, "https:/", "", -1)
+	imageURL = strings.ReplaceAll(imageURL, "https:/", "")
 
 	// Добавляем 'https://' в URL, если отсутствует
 	if !strings.HasPrefix(imageURL, "http://") && !strings.HasPrefix(imageURL, "https://") {
@@ -40,9 +40,7 @@ func PrepareImgParams(u *url.URL) (imgParams *ImgParams, err error) {
 	}
 
 	// Удаляем лишний символ '/' в конце URL изображения
-	if strings.HasSuffix(imageURL, "/") {
-		imageURL = imageURL[:len(imageURL)-1]
-	}
+	imageURL = strings.TrimSuffix(imageURL, "/")
 
 	// Проверяем валидность URl
 	_, err = url.ParseRequestURI(imageURL)
@@ -79,6 +77,8 @@ func NewImgParams(width string, height string, url string) (*ImgParams, error) {
 }
 
 func getURLHash(url string) string {
-	hash := md5.Sum([]byte(url))
-	return hex.EncodeToString(hash[:])
+	hasher := sha256.New()
+	hasher.Write([]byte(url))
+	hashInBytes := hasher.Sum(nil)
+	return hex.EncodeToString(hashInBytes)
 }

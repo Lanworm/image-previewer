@@ -12,7 +12,6 @@ type FileStorage struct {
 }
 
 func (f FileStorage) Set(item image.Image, id string) (bool, error) {
-
 	if err := os.MkdirAll(f.storagePath, os.ModePerm); err != nil {
 		return false, err
 	}
@@ -31,7 +30,6 @@ func (f FileStorage) Set(item image.Image, id string) (bool, error) {
 }
 
 func (f FileStorage) Get(id string) (image.Image, error) {
-
 	file, err := os.Open(filepath.Join(f.storagePath, id))
 	if err != nil {
 		return nil, err
@@ -46,7 +44,6 @@ func (f FileStorage) Get(id string) (image.Image, error) {
 }
 
 func (f FileStorage) Delete(id string) error {
-	//TODO implement me
 	panic("implement me")
 }
 

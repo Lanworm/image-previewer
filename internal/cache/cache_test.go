@@ -1,14 +1,13 @@
 package lrucache
 
 import (
-	"github.com/stretchr/testify/require"
 	"image"
 	"image/jpeg"
-	_ "image/jpeg"
-	_ "image/png"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestLRUCache(t *testing.T) {
@@ -46,7 +45,7 @@ func TestInitCache(t *testing.T) {
 	tempImageFilename := filepath.Join("../../test_images", "temp_image.jpg")
 	createTempImageFile(tempImageFilename)
 
-	err := InitCache("../../test_images", capacity, testCache)
+	err := InitCache("../../test_images", testCache)
 	require.NoError(t, err, "Ошибка при инициализации кеша изображений")
 
 	// Проверка добавления изображения в кеш
@@ -64,7 +63,7 @@ func TestInitCache(t *testing.T) {
 func createTempImageFile(filename string) {
 	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
 
-	err := os.MkdirAll(filepath.Dir(filename), 0777)
+	err := os.MkdirAll(filepath.Dir(filename), 0o777)
 	if err != nil {
 		panic(err)
 	}

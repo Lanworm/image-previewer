@@ -81,7 +81,7 @@ func (c *lruCache) Clear() {
 	c.items = make(map[Key]*ListItem, c.capacity)
 }
 
-func InitCache(folderPath string, cap int, cache Cache) error {
+func InitCache(folderPath string, cache Cache) error {
 	file, err := os.Open(folderPath)
 	if err != nil {
 		return err
@@ -93,8 +93,8 @@ func InitCache(folderPath string, cap int, cache Cache) error {
 		return err
 	}
 
-	for i, fileInfo := range fileInfos {
-		if fileInfo.IsDir() && i <= cap {
+	for _, fileInfo := range fileInfos {
+		if fileInfo.IsDir() {
 			continue
 		}
 		filename := fileInfo.Name()
