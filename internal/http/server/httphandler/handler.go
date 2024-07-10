@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Lanworm/OTUS_GO/final_project/internal/http/server/dto"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/logger"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/service"
+	"github.com/Lanworm/image-previewe/internal/http/server/dto"
+	"github.com/Lanworm/image-previewe/internal/logger"
+	"github.com/Lanworm/image-previewe/internal/service"
 )
 
 type Handler struct {

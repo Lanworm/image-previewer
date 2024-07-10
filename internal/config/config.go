@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Lanworm/OTUS_GO/final_project/internal/validation"
+	"github.com/Lanworm/image-previewe/internal/validation"
 	"gopkg.in/yaml.v3"
 )
 

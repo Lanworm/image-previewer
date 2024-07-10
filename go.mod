@@ -1,4 +1,4 @@
-module github.com/Lanworm/OTUS_GO/final_project
+module github.com/Lanworm/image-previewe
 
 go 1.19
 

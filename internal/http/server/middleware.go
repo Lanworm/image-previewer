@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Lanworm/OTUS_GO/final_project/internal/logger"
+	"github.com/Lanworm/image-previewe/internal/logger"
 )
 
 type Logging struct {

@@ -4,19 +4,19 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	lrucache "github.com/Lanworm/OTUS_GO/final_project/internal/cache"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/service"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/storage/filestorage"
+	lrucache "github.com/Lanworm/image-previewe/internal/cache"
+	"github.com/Lanworm/image-previewe/internal/service"
+	"github.com/Lanworm/image-previewe/internal/storage/filestorage"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/Lanworm/OTUS_GO/final_project/internal/config"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/http/server"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/http/server/httphandler"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/logger"
-	"github.com/Lanworm/OTUS_GO/final_project/pkg/shortcuts"
+	"github.com/Lanworm/image-previewe/internal/config"
+	"github.com/Lanworm/image-previewe/internal/http/server"
+	"github.com/Lanworm/image-previewe/internal/http/server/httphandler"
+	"github.com/Lanworm/image-previewe/internal/logger"
+	"github.com/Lanworm/image-previewe/pkg/shortcuts"
 )
 
 var configFile string

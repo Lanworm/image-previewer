@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Lanworm/OTUS_GO/final_project/internal/config"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/logger"
+	"github.com/Lanworm/image-previewe/internal/config"
+	"github.com/Lanworm/image-previewe/internal/logger"
 )
 
 type Server struct {

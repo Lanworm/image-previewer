@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	lrucache "github.com/Lanworm/OTUS_GO/final_project/internal/cache"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/logger"
-	"github.com/Lanworm/OTUS_GO/final_project/internal/storage"
+	lrucache "github.com/Lanworm/image-previewe/internal/cache"
+	"github.com/Lanworm/image-previewe/internal/logger"
+	"github.com/Lanworm/image-previewe/internal/storage"
 	"github.com/nfnt/resize"
 	"image"
 	"io"

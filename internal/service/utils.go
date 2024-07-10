@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Lanworm/OTUS_GO/final_project/internal/validation"
+	"github.com/Lanworm/image-previewe/internal/validation"
 )
 
 var (
