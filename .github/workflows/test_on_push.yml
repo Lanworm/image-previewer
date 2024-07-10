@@ -1,0 +1,67 @@
+name: Run tests on any Push event
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  run_lint:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ~1.22
+
+      - name: Check out code
+        uses: actions/checkout@
+
+      - name: Linters
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.50.1
+
+
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.22
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Unit tests
+        run: go test -v -count=1 -race -timeout=1m ./...
+
+
+
+#  tests_by_makefile:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ^1.22
+#
+#      - name: Check out code
+#        uses: actions/checkout@v3
+#
+#      - name: make lint
+#        run: make lint
+#
+#
+#      - name: make build
+#        run: make build
+#
+#
+#      - name: make test
+#        run: make test
+
