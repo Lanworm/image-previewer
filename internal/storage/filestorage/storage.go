@@ -11,6 +11,11 @@ type FileStorage struct {
 	storagePath string
 }
 
+func (f FileStorage) Delete(id string) error {
+	// TODO implement me
+	panic(id)
+}
+
 func (f FileStorage) Set(item image.Image, id string) (bool, error) {
 	if err := os.MkdirAll(f.storagePath, os.ModePerm); err != nil {
 		return false, err
@@ -41,10 +46,6 @@ func (f FileStorage) Get(id string) (image.Image, error) {
 		return nil, err
 	}
 	return img, nil
-}
-
-func (f FileStorage) Delete(id string) error {
-	panic("implement me")
 }
 
 func NewFileStorage(path string) *FileStorage {

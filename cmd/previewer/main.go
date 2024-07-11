@@ -9,14 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	lrucache "github.com/Lanworm/image-previewe/internal/cache"
-	"github.com/Lanworm/image-previewe/internal/config"
-	"github.com/Lanworm/image-previewe/internal/http/server"
-	"github.com/Lanworm/image-previewe/internal/http/server/httphandler"
-	"github.com/Lanworm/image-previewe/internal/logger"
-	"github.com/Lanworm/image-previewe/internal/service"
-	"github.com/Lanworm/image-previewe/internal/storage/filestorage"
-	"github.com/Lanworm/image-previewe/pkg/shortcuts"
+	lrucache "github.com/Lanworm/image-previewer/internal/cache"
+	"github.com/Lanworm/image-previewer/internal/config"
+	"github.com/Lanworm/image-previewer/internal/http/server"
+	"github.com/Lanworm/image-previewer/internal/http/server/httphandler"
+	"github.com/Lanworm/image-previewer/internal/logger"
+	"github.com/Lanworm/image-previewer/internal/service"
+	"github.com/Lanworm/image-previewer/internal/storage/filestorage"
+	"github.com/Lanworm/image-previewer/pkg/shortcuts"
 )
 
 var configFile string

@@ -1,2 +1,2 @@
-# image-previewer
+# image-previewerr
 Graduation work on OTUS GO
