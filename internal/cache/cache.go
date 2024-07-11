@@ -5,7 +5,7 @@ import (
 	"image"
 	"sync"
 
-	"github.com/Lanworm/image-previewe/internal/storage"
+	"github.com/Lanworm/image-previewer/internal/storage"
 )
 
 type Key string

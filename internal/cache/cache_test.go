@@ -4,7 +4,7 @@ import (
 	"image"
 	"testing"
 
-	"github.com/Lanworm/image-previewe/internal/storage/filestorage"
+	"github.com/Lanworm/image-previewer/internal/storage/filestorage"
 	"github.com/stretchr/testify/require"
 )
 
