@@ -69,8 +69,7 @@ func NewImgParams(width string, height string, url string) (*ImgParams, error) {
 		URL:    url,
 	}
 
-	err := validation.Validate(p)
-	if err != nil {
+	if err := validation.Validate(p); err != nil {
 		return nil, err
 	}
 	return p, nil
