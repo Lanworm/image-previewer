@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	lrucache "github.com/Lanworm/image-previewe/internal/cache"
-	"github.com/Lanworm/image-previewe/internal/logger"
-	"github.com/Lanworm/image-previewe/internal/storage"
+	lrucache "github.com/Lanworm/image-previewer/internal/cache"
+	"github.com/Lanworm/image-previewer/internal/logger"
+	"github.com/Lanworm/image-previewer/internal/storage"
 	"github.com/nfnt/resize"
 )
 

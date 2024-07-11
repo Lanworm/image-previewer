@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Lanworm/image-previewe/internal/config"
-	"github.com/Lanworm/image-previewe/internal/logger"
+	"github.com/Lanworm/image-previewer/internal/config"
+	"github.com/Lanworm/image-previewer/internal/logger"
 )
 
 type Server struct {

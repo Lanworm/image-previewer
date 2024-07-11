@@ -1,8 +1,5 @@
 run:
   tests: true
-  build-tags:
-    - bench
-    - !bench
 
 linters-settings:
   funlen:
@@ -16,19 +13,10 @@ linters-settings:
           - "!$test"
         allow:
           - $gostd
-          - golang.org/x/exp
-          - github.com/ozgio/strutil
-          - go.uber.org/goleak
-          - github.com/Lanworm/image-previewe
-          - github.com/json-iterator/go
-          - github.com/spf13/cobra
-          - github.com/jackc/pgx/v5/pgxpool
+          - github.com/Lanworm/image-previewer
           - github.com/go-playground/validator/v10
           - gopkg.in/yaml.v3
-          - github.com/google/uuid
-          - google.golang.org/grpc
-          - google.golang.org/protobuf
-
+          - github.com/nfnt/resize
 issues:
   exclude-rules:
     - path: _test\.go
@@ -44,6 +32,7 @@ linters:
   enable:
     - asciicheck
     - bodyclose
+    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -61,10 +50,13 @@ linters:
     - gofmt
     - gofumpt
     - goheader
+    - gomoddirectives
+    - gomodguard
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    - ifshort
     - importas
     - ineffassign
     - lll
@@ -77,12 +69,18 @@ linters:
     - prealloc
     - predeclared
     - revive
+    - rowserrcheck
+    - sqlclosecheck
     - staticcheck
+    - structcheck
     - stylecheck
     - tagliatelle
     - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
+    - varcheck
+    - wastedassign
     - whitespace

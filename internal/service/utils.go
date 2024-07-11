@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Lanworm/image-previewe/internal/validation"
+	"github.com/Lanworm/image-previewer/internal/validation"
 )
 
 var (

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Lanworm/image-previewe/internal/validation"
+	"github.com/Lanworm/image-previewer/internal/validation"
 	"gopkg.in/yaml.v3"
 )
 
