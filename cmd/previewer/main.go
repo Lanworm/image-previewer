@@ -51,7 +51,7 @@ func main() {
 	httpServer.RegisterRoutes(handlerHTTP)
 	go func() {
 		logg.ServerLog(fmt.Sprintf("http server started on: http://%s", configs.Server.HTTP.GetFullAddress()))
-		if err := httpServer.Start(ctx); err != nil {
+		if err := httpServer.Start(); err != nil {
 			logg.Error("failed to start http server: " + err.Error())
 			cancel()
 			return

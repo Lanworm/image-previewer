@@ -4,32 +4,26 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/Lanworm/image-previewer/internal/validation"
+	"github.com/gorilla/mux"
 )
 
 var (
-	ErrInvalidNumberOfArguments           = errors.New("wrong number of arguments")
 	ErrInvalidFormatOfArguments           = errors.New("wrong format of arguments")
 	ErrInvalidArgumentTypeOfWidthOrHeight = errors.New("invalid argument type of width or height")
 	ErrInvalidURL                         = errors.New("invalid URL")
 )
 
-func PrepareImgParams(u *url.URL) (imgParams *ImgParams, err error) {
-	parts := strings.Split(u.String(), "/")
-
-	if len(parts) < 4 {
-		return nil, ErrInvalidNumberOfArguments
-	}
-
-	width := parts[2]
-	height := parts[3]
-
-	imageURLParts := parts[4:]
-	imageURL := strings.Join(imageURLParts, "/")
+func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
+	vars := mux.Vars(r)
+	width := vars["width"]
+	height := vars["height"]
+	imageURL := vars["url"]
 
 	// Удаляем "https/" из URL, если присутствует
 	imageURL = strings.ReplaceAll(imageURL, "https:/", "")

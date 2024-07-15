@@ -58,6 +58,7 @@ func TestInitCache(t *testing.T) {
 	// Удаление временного файла после теста
 	err = storage.Delete("temp_image.jpg")
 	if err != nil {
+		t.Errorf("Удаление временного файла после теста: %v", err)
 		return
 	}
 }
