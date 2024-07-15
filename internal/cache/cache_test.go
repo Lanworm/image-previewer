@@ -2,16 +2,15 @@ package lrucache
 
 import (
 	"image"
-	"image/jpeg"
-	"os"
-	"path/filepath"
 	"testing"
 
+	"github.com/Lanworm/image-previewer/internal/storage/filestorage"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLRUCache(t *testing.T) {
-	cache := NewCache(2)
+	storage := filestorage.NewFileStorage("../../test_images")
+	cache := NewCache(2, storage)
 
 	// Проверка добавления и получения изображения из кеша
 	img1 := image.NewRGBA(image.Rect(0, 0, 100, 100))
@@ -39,13 +38,16 @@ func TestLRUCache(t *testing.T) {
 
 func TestInitCache(t *testing.T) {
 	capacity := 2
-	testCache := NewCache(capacity)
+	storage := filestorage.NewFileStorage("../../test_images")
+	testCache := NewCache(capacity, storage)
 
 	// Создание временного файла с изображением для теста
-	tempImageFilename := filepath.Join("../../test_images", "temp_image.jpg")
-	createTempImageFile(tempImageFilename)
-
-	err := InitCache("../../test_images", testCache)
+	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
+	err := storage.Set(img, "temp_image.jpg")
+	if err != nil {
+		return
+	}
+	err = testCache.InitCache("../../test_images")
 	require.NoError(t, err, "Ошибка при инициализации кеша изображений")
 
 	// Проверка добавления изображения в кеш
@@ -54,26 +56,9 @@ func TestInitCache(t *testing.T) {
 	require.NotNil(t, retrievedImg, "Изображение 'temp_image.jpg' не было добавлено в кеш")
 
 	// Удаление временного файла после теста
-	err = os.Remove(tempImageFilename)
+	err = storage.Delete("temp_image.jpg")
 	if err != nil {
-		panic(err)
-	}
-}
-
-func createTempImageFile(filename string) {
-	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
-
-	err := os.MkdirAll(filepath.Dir(filename), 0o777)
-	if err != nil {
-		panic(err)
-	}
-
-	file, err := os.Create(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	if err := jpeg.Encode(file, img, nil); err != nil {
-		panic(err)
+		t.Errorf("Удаление временного файла после теста: %v", err)
+		return
 	}
 }

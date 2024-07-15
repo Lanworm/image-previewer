@@ -17,6 +17,7 @@ linters-settings:
           - github.com/go-playground/validator/v10
           - gopkg.in/yaml.v3
           - github.com/nfnt/resize
+          - github.com/gorilla/mux
 issues:
   exclude-rules:
     - path: _test\.go

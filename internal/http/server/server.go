@@ -8,13 +8,14 @@ import (
 
 	"github.com/Lanworm/image-previewer/internal/config"
 	"github.com/Lanworm/image-previewer/internal/logger"
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	logger *logger.Logger
 	conf   config.ServerHTTPConf
 	srv    *http.Server
-	mux    *http.ServeMux
+	mux    *mux.Router
 	done   bool
 }
 
@@ -29,11 +30,11 @@ func NewHTTPServer(
 	return &Server{
 		logger: logger,
 		conf:   conf,
-		mux:    http.NewServeMux(),
+		mux:    mux.NewRouter(),
 	}
 }
 
-func (s *Server) Start(_ context.Context) error {
+func (s *Server) Start() error {
 	if s.srv != nil {
 		return errors.New("http server already started")
 	}

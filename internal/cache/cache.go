@@ -3,8 +3,9 @@ package lrucache
 import (
 	"fmt"
 	"image"
-	"os"
-	"path/filepath"
+	"sync"
+
+	"github.com/Lanworm/image-previewer/internal/storage"
 )
 
 type Key string
@@ -13,6 +14,7 @@ type Cache interface {
 	Set(key Key, value image.Image) bool
 	Get(key Key) (image.Image, bool)
 	Clear()
+	InitCache(path string) error
 }
 
 type CacheListItem struct {
@@ -24,17 +26,22 @@ type lruCache struct {
 	capacity int
 	queue    List
 	items    map[Key]*ListItem
+	mu       sync.Mutex
+	storage  storage.Storage
 }
 
-func NewCache(capacity int) Cache {
+func NewCache(capacity int, storage storage.Storage) Cache {
 	return &lruCache{
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[Key]*ListItem, capacity),
+		storage:  storage,
 	}
 }
 
 func (c *lruCache) Set(key Key, value image.Image) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	cacheListItem, ok := c.items[key]
 
 	if ok {
@@ -64,6 +71,8 @@ func (c *lruCache) Set(key Key, value image.Image) bool {
 }
 
 func (c *lruCache) Get(key Key) (image.Image, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	cacheItem, ok := c.items[key]
 
 	if ok {
@@ -81,37 +90,21 @@ func (c *lruCache) Clear() {
 	c.items = make(map[Key]*ListItem, c.capacity)
 }
 
-func InitCache(folderPath string, cache Cache) error {
-	file, err := os.Open(folderPath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	fileInfos, err := file.Readdir(-1)
+func (c *lruCache) InitCache(folderPath string) error {
+	fileNames, err := c.storage.GetFileList(folderPath)
 	if err != nil {
 		return err
 	}
 
-	for _, fileInfo := range fileInfos {
-		if fileInfo.IsDir() {
-			continue
-		}
-		filename := fileInfo.Name()
-		filePath := filepath.Join(folderPath, filename)
-
-		imgFile, err := os.Open(filePath)
+	for _, fileName := range fileNames {
+		imgFile, err := c.storage.Get(fileName)
 		if err != nil {
 			return err
 		}
-		defer imgFile.Close()
 
-		img, _, err := image.Decode(imgFile)
-		if err != nil {
-			return err
-		}
-		cache.Set(Key(filename), img)
-		fmt.Printf("added to the cache: %s\n", filename)
+		c.Set(Key(fileName), imgFile)
+		fmt.Printf("added to the cache: %s\n", fileName)
 	}
+
 	return nil
 }

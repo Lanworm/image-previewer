@@ -15,13 +15,13 @@ import (
 
 type ImageService struct {
 	logger  *logger.Logger
-	storage storage.IStorage
+	storage storage.Storage
 	cache   lrucache.Cache
 }
 
 func NewImageService(
 	logger *logger.Logger,
-	storage storage.IStorage,
+	storage storage.Storage,
 	cache lrucache.Cache,
 ) *ImageService {
 	return &ImageService{
@@ -67,10 +67,11 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams) (img image.Image, err err
 	if err != nil {
 		return nil, err
 	}
+
 	s.cache.Set(lrucache.Key(imageID), sourceImg)
 	newImg := resize.Resize(imgParams.Width, imgParams.Height, sourceImg, resize.Lanczos3)
 
-	_, err = s.storage.Set(newImg, imageID)
+	err = s.storage.Set(newImg, imageID)
 	if err != nil {
 		return nil, err
 	}

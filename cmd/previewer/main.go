@@ -38,9 +38,10 @@ func main() {
 
 	logg, err := logger.New(configs.Logger.Level, os.Stdout)
 	shortcuts.FatalIfErr(err)
-	cache := lrucache.NewCache(configs.Cache.Capacity)
-	lrucache.InitCache(configs.Storage.Path, cache)
 	storage := filestorage.NewFileStorage(configs.Storage.Path)
+	cache := lrucache.NewCache(configs.Cache.Capacity, storage)
+	err = cache.InitCache(configs.Storage.Path)
+	shortcuts.FatalIfErr(err)
 	imgService := service.NewImageService(logg, storage, cache)
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -50,7 +51,7 @@ func main() {
 	httpServer.RegisterRoutes(handlerHTTP)
 	go func() {
 		logg.ServerLog(fmt.Sprintf("http server started on: http://%s", configs.Server.HTTP.GetFullAddress()))
-		if err := httpServer.Start(ctx); err != nil {
+		if err := httpServer.Start(); err != nil {
 			logg.Error("failed to start http server: " + err.Error())
 			cancel()
 			return

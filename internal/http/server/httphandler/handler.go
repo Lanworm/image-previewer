@@ -31,7 +31,7 @@ func (h *Handler) ResizeHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	imgParams, err := service.PrepareImgParams(r.URL)
+	imgParams, err := service.PrepareImgParams(r)
 	if err != nil {
 		writeError(http.StatusInternalServerError, w, err.Error())
 		h.logger.Error(err.Error())
@@ -46,7 +46,6 @@ func (h *Handler) ResizeHandler(
 
 	buf := new(bytes.Buffer)
 	encodeErr := jpeg.Encode(buf, img, nil)
-	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 	if encodeErr != nil {
 		writeError(http.StatusInternalServerError, w, encodeErr.Error())

@@ -11,27 +11,26 @@ type FileStorage struct {
 	storagePath string
 }
 
-func (f FileStorage) Delete(id string) error {
-	// TODO implement me
-	panic(id)
+func NewFileStorage(path string) *FileStorage {
+	return &FileStorage{storagePath: path}
 }
 
-func (f FileStorage) Set(item image.Image, id string) (bool, error) {
+func (f FileStorage) Set(item image.Image, id string) error {
 	if err := os.MkdirAll(f.storagePath, os.ModePerm); err != nil {
-		return false, err
+		return err
 	}
 
-	outputFile, cfErr := os.Create(filepath.Join(f.storagePath, id))
-	if cfErr != nil {
-		return false, cfErr
+	outputFile, err := os.Create(filepath.Join(f.storagePath, id))
+	if err != nil {
+		return err
 	}
 
 	defer outputFile.Close()
-	EncodeErr := jpeg.Encode(outputFile, item, nil)
-	if EncodeErr != nil {
-		return false, EncodeErr
+	err = jpeg.Encode(outputFile, item, nil)
+	if err != nil {
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 func (f FileStorage) Get(id string) (image.Image, error) {
@@ -48,6 +47,34 @@ func (f FileStorage) Get(id string) (image.Image, error) {
 	return img, nil
 }
 
-func NewFileStorage(path string) *FileStorage {
-	return &FileStorage{storagePath: path}
+func (f FileStorage) Delete(id string) error {
+	err := os.Remove(filepath.Join(f.storagePath, id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f FileStorage) GetFileList(folderPath string) ([]string, error) {
+	file, err := os.Open(folderPath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileInfos, err := file.Readdir(-1)
+	if err != nil {
+		return nil, err
+	}
+
+	filenames := make([]string, 0, len(fileInfos))
+
+	for _, fileInfo := range fileInfos {
+		if fileInfo.IsDir() {
+			continue
+		}
+		filenames = append(filenames, fileInfo.Name())
+	}
+
+	return filenames, nil
 }
