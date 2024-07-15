@@ -17,6 +17,7 @@ type Config struct {
 	Server  ServerConf
 	Cache   CacheConf
 	Storage StorageConf
+	Service ServiceConf
 }
 
 type ServerConf struct {
@@ -44,6 +45,9 @@ type CacheConf struct {
 }
 type StorageConf struct {
 	Path string `validate:"required,dirpath"`
+}
+type ServiceConf struct {
+	Size int `validate:"required"`
 }
 
 func NewConfig(configFile string) (*Config, error) {

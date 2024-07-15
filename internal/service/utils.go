@@ -58,8 +58,8 @@ func NewImgParams(width string, height string, url string) (*ImgParams, error) {
 	}
 
 	p := &ImgParams{
-		Width:  uint(w),
-		Height: uint(h),
+		Width:  w,
+		Height: h,
 		URL:    url,
 	}
 

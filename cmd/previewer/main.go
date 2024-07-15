@@ -42,7 +42,7 @@ func main() {
 	cache := lrucache.NewCache(configs.Cache.Capacity, storage)
 	err = cache.InitCache(configs.Storage.Path, storage)
 	shortcuts.FatalIfErr(err)
-	imgService := service.NewImageService(logg, storage, cache)
+	imgService := service.NewImageService(logg, storage, cache, configs.Service.Size)
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
