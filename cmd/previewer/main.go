@@ -40,7 +40,7 @@ func main() {
 	shortcuts.FatalIfErr(err)
 	storage := filestorage.NewFileStorage(configs.Storage.Path)
 	cache := lrucache.NewCache(configs.Cache.Capacity, storage)
-	err = cache.InitCache(configs.Storage.Path)
+	err = cache.InitCache(configs.Storage.Path, storage)
 	shortcuts.FatalIfErr(err)
 	imgService := service.NewImageService(logg, storage, cache)
 	ctx, cancel := signal.NotifyContext(context.Background(),

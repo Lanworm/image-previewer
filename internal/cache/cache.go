@@ -14,7 +14,7 @@ type Cache interface {
 	Set(key Key, value image.Image) bool
 	Get(key Key) (image.Image, bool)
 	Clear()
-	InitCache(path string) error
+	InitCache(path string, storage storage.Storage) error
 }
 
 type CacheListItem struct {
@@ -27,7 +27,6 @@ type lruCache struct {
 	queue    List
 	items    map[Key]*ListItem
 	mu       sync.Mutex
-	storage  storage.Storage
 }
 
 func NewCache(capacity int, storage storage.Storage) Cache {
@@ -35,7 +34,6 @@ func NewCache(capacity int, storage storage.Storage) Cache {
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[Key]*ListItem, capacity),
-		storage:  storage,
 	}
 }
 
@@ -86,18 +84,20 @@ func (c *lruCache) Get(key Key) (image.Image, bool) {
 }
 
 func (c *lruCache) Clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.queue = NewList()
 	c.items = make(map[Key]*ListItem, c.capacity)
 }
 
-func (c *lruCache) InitCache(folderPath string) error {
-	fileNames, err := c.storage.GetFileList(folderPath)
+func (c *lruCache) InitCache(folderPath string, storage storage.Storage) error {
+	fileNames, err := storage.GetFileList(folderPath)
 	if err != nil {
 		return err
 	}
 
 	for _, fileName := range fileNames {
-		imgFile, err := c.storage.Get(fileName)
+		imgFile, err := storage.Get(fileName)
 		if err != nil {
 			return err
 		}

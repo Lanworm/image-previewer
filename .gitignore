@@ -2,3 +2,5 @@ logs/
 bin/
 images/
 test_images/
+.github
+.idea

@@ -1,6 +1,7 @@
 package filestorage
 
 import (
+	"fmt"
 	"image"
 	"image/jpeg"
 	"os"
@@ -50,19 +51,13 @@ func (f FileStorage) Get(id string) (image.Image, error) {
 func (f FileStorage) Delete(id string) error {
 	err := os.Remove(filepath.Join(f.storagePath, id))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to delete file: %w", err)
 	}
 	return nil
 }
 
 func (f FileStorage) GetFileList(folderPath string) ([]string, error) {
-	file, err := os.Open(folderPath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	fileInfos, err := file.Readdir(-1)
+	fileInfos, err := os.ReadDir(folderPath)
 	if err != nil {
 		return nil, err
 	}
@@ -70,10 +65,9 @@ func (f FileStorage) GetFileList(folderPath string) ([]string, error) {
 	filenames := make([]string, 0, len(fileInfos))
 
 	for _, fileInfo := range fileInfos {
-		if fileInfo.IsDir() {
-			continue
+		if !fileInfo.IsDir() {
+			filenames = append(filenames, fileInfo.Name())
 		}
-		filenames = append(filenames, fileInfo.Name())
 	}
 
 	return filenames, nil
