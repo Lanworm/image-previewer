@@ -9,8 +9,7 @@ import (
 )
 
 func TestLRUCache(t *testing.T) {
-	storage := filestorage.NewFileStorage("../../test_images")
-	cache := NewCache(2, storage)
+	cache := NewCache(2)
 
 	// Проверка добавления и получения изображения из кеша
 	img1 := image.NewRGBA(image.Rect(0, 0, 100, 100))
@@ -39,7 +38,7 @@ func TestLRUCache(t *testing.T) {
 func TestInitCache(t *testing.T) {
 	capacity := 2
 	storage := filestorage.NewFileStorage("../../test_images")
-	testCache := NewCache(capacity, storage)
+	testCache := NewCache(capacity)
 
 	// Создание временного файла с изображением для теста
 	img := image.NewRGBA(image.Rect(0, 0, 100, 100))

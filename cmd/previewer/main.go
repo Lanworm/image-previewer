@@ -39,7 +39,7 @@ func main() {
 	logg, err := logger.New(configs.Logger.Level, os.Stdout)
 	shortcuts.FatalIfErr(err)
 	storage := filestorage.NewFileStorage(configs.Storage.Path)
-	cache := lrucache.NewCache(configs.Cache.Capacity, storage)
+	cache := lrucache.NewCache(configs.Cache.Capacity)
 	err = cache.InitCache(configs.Storage.Path, storage)
 	shortcuts.FatalIfErr(err)
 	imgService := service.NewImageService(logg, storage, cache, configs.Service.Size)

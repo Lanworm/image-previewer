@@ -46,6 +46,13 @@ func (h *Handler) ResizeHandler(
 
 	buf := new(bytes.Buffer)
 	encodeErr := jpeg.Encode(buf, img, nil)
+
+	for key, values := range r.Header {
+		for _, value := range values {
+			w.Header().Set(key, value)
+		}
+	}
+	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 	if encodeErr != nil {
 		writeError(http.StatusInternalServerError, w, encodeErr.Error())

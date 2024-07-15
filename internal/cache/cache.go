@@ -29,7 +29,7 @@ type lruCache struct {
 	mu       sync.Mutex
 }
 
-func NewCache(capacity int, storage storage.Storage) Cache {
+func NewCache(capacity int) Cache {
 	return &lruCache{
 		capacity: capacity,
 		queue:    NewList(),

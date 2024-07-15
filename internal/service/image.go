@@ -50,7 +50,6 @@ var (
 )
 
 func (s *ImageService) ResizeImg(imgParams *ImgParams) (img image.Image, err error) {
-
 	imageID := getURLHash(imgParams.URL)
 
 	// Проверяем наличие изображения в кэше
