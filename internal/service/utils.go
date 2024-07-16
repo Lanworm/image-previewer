@@ -4,13 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"github.com/Lanworm/image-previewer/internal/validation"
+	"github.com/gorilla/mux"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-
-	"github.com/Lanworm/image-previewer/internal/validation"
-	"github.com/gorilla/mux"
 )
 
 var (
@@ -41,7 +40,7 @@ func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
 	if err != nil {
 		return nil, ErrInvalidURL
 	}
-
+	// Создаем новую структуру с параметрами
 	params, err := NewImgParams(width, height, imageURL)
 	if err != nil {
 		return nil, ErrInvalidFormatOfArguments
@@ -52,7 +51,7 @@ func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
 func NewImgParams(width string, height string, url string) (*ImgParams, error) {
 	w, errw := strconv.Atoi(width)
 	h, errh := strconv.Atoi(height)
-
+	//
 	if errw != nil || errh != nil {
 		return nil, ErrInvalidArgumentTypeOfWidthOrHeight
 	}
