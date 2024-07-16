@@ -40,7 +40,7 @@ build-nginx-img:
     		-f int_test/Dockerfile .
 
 run-nginx-img: build-nginx-img
-	 docker run -d -p $(PORT):80 --name $(CONTAINER_NAME) $(NGINX_IMAGE_NAME)
+	docker run -d -p $(PORT):80 --name $(CONTAINER_NAME) $(NGINX_IMAGE_NAME)
 
 stop-nginx-img:
 	docker stop $(CONTAINER_NAME)
