@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Unit tests
-        run: go test -race -count 100 ./...
+        run: make test
 
 
   run_int_tests:
@@ -55,7 +55,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Build
+      - name: Integration tests
         run: make int_test
 
 
