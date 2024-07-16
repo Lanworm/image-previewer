@@ -63,7 +63,9 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img ima
 
 	// Если изображение не найдено в кэше, загружаем его
 	sourceImg, err := s.getImage(imgParams.URL, r)
-
+	if err != nil {
+		return nil, err
+	}
 	// Изменяем размер
 	resizedImg := resize.Resize(uint(imgParams.Width), uint(imgParams.Height), sourceImg, resize.Lanczos3)
 
@@ -79,10 +81,9 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img ima
 	return resizedImg, nil
 }
 
-func (s *ImageService) getImage(imgUrl string, r *http.Request) (image.Image, error) {
-
+func (s *ImageService) getImage(imgURL string, r *http.Request) (image.Image, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", imgUrl, nil)
+	req, err := http.NewRequest("GET", imgURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +120,7 @@ func (s *ImageService) getImage(imgUrl string, r *http.Request) (image.Image, er
 		return nil, ErrImageSize
 	}
 
-	fmt.Println("Downloaded from URL:", imgUrl)
+	fmt.Println("Downloaded from URL:", imgURL)
 	// Читаем изображение
 	sourceImg, _, err := image.Decode(resp.Body)
 	if err != nil {

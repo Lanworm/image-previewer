@@ -31,7 +31,6 @@ func (h *Handler) ResizeHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-
 	imgParams, err := service.PrepareImgParams(r)
 	if err != nil {
 		writeError(http.StatusInternalServerError, w, err.Error())

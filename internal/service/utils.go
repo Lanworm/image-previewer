@@ -4,12 +4,13 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"github.com/Lanworm/image-previewer/internal/validation"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/Lanworm/image-previewer/internal/validation"
+	"github.com/gorilla/mux"
 )
 
 var (
