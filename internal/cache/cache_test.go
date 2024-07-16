@@ -9,8 +9,7 @@ import (
 )
 
 func TestLRUCache(t *testing.T) {
-	storage := filestorage.NewFileStorage("../../test_images")
-	cache := NewCache(2, storage)
+	cache := NewCache(2)
 
 	// Проверка добавления и получения изображения из кеша
 	img1 := image.NewRGBA(image.Rect(0, 0, 100, 100))
@@ -39,7 +38,7 @@ func TestLRUCache(t *testing.T) {
 func TestInitCache(t *testing.T) {
 	capacity := 2
 	storage := filestorage.NewFileStorage("../../test_images")
-	testCache := NewCache(capacity, storage)
+	testCache := NewCache(capacity)
 
 	// Создание временного файла с изображением для теста
 	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
@@ -47,7 +46,7 @@ func TestInitCache(t *testing.T) {
 	if err != nil {
 		return
 	}
-	err = testCache.InitCache("../../test_images")
+	err = testCache.InitCache("../../test_images", storage)
 	require.NoError(t, err, "Ошибка при инициализации кеша изображений")
 
 	// Проверка добавления изображения в кеш
@@ -58,7 +57,7 @@ func TestInitCache(t *testing.T) {
 	// Удаление временного файла после теста
 	err = storage.Delete("temp_image.jpg")
 	if err != nil {
-		t.Errorf("Удаление временного файла после теста: %v", err)
+		t.Errorf("Ошибка удаление временного файла после теста: %v", err)
 		return
 	}
 }
