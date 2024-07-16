@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"image"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	lrucache "github.com/Lanworm/image-previewer/internal/cache"
+	"github.com/Lanworm/image-previewer/internal/http/client"
 	"github.com/Lanworm/image-previewer/internal/logger"
 	"github.com/Lanworm/image-previewer/internal/storage"
 	"github.com/nfnt/resize"
@@ -46,7 +46,6 @@ var (
 	ErrImageNotFound  = errors.New("image not found on remote server")
 	ErrTargetNotImage = errors.New("requested URL does not point to an image")
 	ErrImageSize      = errors.New("image size exceeds the limit")
-	ErrOutOfBounds    = errors.New("image is out of bounds")
 )
 
 func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img image.Image, err error) {
@@ -82,29 +81,13 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img ima
 }
 
 func (s *ImageService) getImage(imgURL string, r *http.Request) (image.Image, error) {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", imgURL, nil)
-	if err != nil {
-		return nil, err
-	}
+	HTTPClient := client.NewHTTPClient(100 * time.Second)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	req = req.WithContext(ctx)
-
-	for key, values := range r.Header {
-		for _, value := range values {
-			req.Header.Add(key, value)
-		}
-	}
-
-	resp, err := client.Do(req)
+	resp, err := HTTPClient.DoRequest("GET", imgURL, nil, r.Header)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
 	// Проверяем статус ответа
 	if resp.StatusCode == 404 {
 		return nil, ErrImageNotFound

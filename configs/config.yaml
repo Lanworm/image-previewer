@@ -10,4 +10,4 @@ cache:
 storage:
   path: "./images/"
 service:
-  size: 1
+  size: 2048

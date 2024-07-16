@@ -55,27 +55,3 @@ func (rc *Recovery) Wrap(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-func ContentType(t string, next http.HandlerFunc) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set("content-type", t)
-		next(writer, request)
-	}
-}
-
-func Method(method string, next http.HandlerFunc) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		if request.Method != method {
-			writer.WriteHeader(http.StatusMethodNotAllowed)
-			writer.Write([]byte(fmt.Sprintf(
-				"handler %s support method %s",
-				request.URL.Path,
-				method,
-			)))
-
-			return
-		}
-
-		next(writer, request)
-	}
-}

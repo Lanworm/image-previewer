@@ -2,23 +2,27 @@ package int_test
 
 import (
 	"flag"
-	"fmt"
 	"net/http"
 	"testing"
+	"time"
+
+	"github.com/Lanworm/image-previewer/internal/http/client"
 )
 
 var Port = flag.String("port", "8080", "Container port")
 
-// Функция для проверки наличия изображения по URL.
 func checkImagePresence(imagePath string) bool {
-	fmt.Println(Port)
 	baseURL := "http://localhost:" + *Port + "/temp/"
-	response, err := http.Get(baseURL + imagePath)
+
+	HTTPClient := client.NewHTTPClient(100 * time.Second)
+
+	resp, err := HTTPClient.DoRequest("GET", baseURL+imagePath, nil, nil)
 	if err != nil {
 		return false
 	}
-	defer response.Body.Close()
-	return response.StatusCode == http.StatusOK
+	defer resp.Body.Close()
+
+	return resp.StatusCode == http.StatusOK
 }
 
 // Тестирование различных сценариев.
