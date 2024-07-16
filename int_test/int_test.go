@@ -12,7 +12,7 @@ var Port = flag.String("port", "8080", "Container port")
 // Функция для проверки наличия изображения по URL.
 func checkImagePresence(imagePath string) bool {
 	fmt.Println(Port)
-	baseURL := "http://localhost:" + *Port + "/images/"
+	baseURL := "http://localhost:" + *Port + "/temp/"
 	response, err := http.Get(baseURL + imagePath)
 	if err != nil {
 		return false
