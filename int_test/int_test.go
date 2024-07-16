@@ -9,7 +9,7 @@ import (
 
 var Port = flag.String("port", "8080", "Container port")
 
-// Функция для проверки наличия изображения по URL
+// Функция для проверки наличия изображения по URL.
 func checkImagePresence(imagePath string) bool {
 	fmt.Println(Port)
 	baseURL := "http://localhost:" + *Port + "/images/"
@@ -21,10 +21,9 @@ func checkImagePresence(imagePath string) bool {
 	return response.StatusCode == http.StatusOK
 }
 
-// Тестирование различных сценариев
+// Тестирование различных сценариев.
 func TestImageExistence(t *testing.T) {
-	imagePath := "image1.jpg"
-	if !checkImagePresence(imagePath) {
+	if imagePath := "image1.jpg"; !checkImagePresence(imagePath) {
 		t.Errorf("Expected image %s to exist, but it was not found", imagePath)
 	}
 }
