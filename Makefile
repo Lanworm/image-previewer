@@ -1,8 +1,5 @@
 BIN := "./bin/previewer"
 DOCKER_IMG="previewer:develop"
-NGINX_IMAGE_NAME := "nginx-image"
-CONTAINER_NAME := "nginx-container"
-PORT := 8080
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
@@ -17,7 +14,7 @@ build-img:
 	docker build \
 		--build-arg=LDFLAGS="$(LDFLAGS)" \
 		-t $(DOCKER_IMG) \
-		-f build/Dockerfile .
+		-f Dockerfile .
 
 run-img: build-img
 	docker run $(DOCKER_IMG)
@@ -34,22 +31,21 @@ install-lint-deps:
 lint: install-lint-deps
 	golangci-lint run ./...
 
-build-nginx-img:
-	docker build \
-    		-t $(NGINX_IMAGE_NAME) \
-    		-f int_test/Dockerfile .
+docker-up:
+	docker-compose up -d
+	@while [ "$$(docker-compose ps -q | wc -l)" -lt 2 ]; do \
+        echo "Waiting for containers to be ready..."; \
+        sleep 1; \
+    done
 
-run-nginx-img: build-nginx-img
-	docker run -d -p $(PORT):80 --name $(CONTAINER_NAME) $(NGINX_IMAGE_NAME)
+docker-down:
+	docker-compose down
 
-stop-nginx-img:
-	docker stop $(CONTAINER_NAME)
-	docker rm $(CONTAINER_NAME)
+int-test:
+	go test ./int_test/...
 
-
-run-int-test:
-	go test ./int_test/... -v -port=$(PORT)
-
-int_test: build-nginx-img run-nginx-img run-int-test stop-nginx-img
+run-int-test: docker-up
+	@make int-test
+	@make docker-down
 
 .PHONY: build run build-img run-img version test lint

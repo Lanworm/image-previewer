@@ -26,11 +26,12 @@ func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
 	imageURL := vars["url"]
 
 	// Удаляем "https/" из URL, если присутствует
+	imageURL = strings.ReplaceAll(imageURL, "http:/", "")
 	imageURL = strings.ReplaceAll(imageURL, "https:/", "")
 
 	// Добавляем 'https://' в URL, если отсутствует
 	if !strings.HasPrefix(imageURL, "http://") && !strings.HasPrefix(imageURL, "https://") {
-		imageURL = "https://" + imageURL
+		imageURL = "http://" + imageURL
 	}
 
 	// Удаляем лишний символ '/' в конце URL изображения

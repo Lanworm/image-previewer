@@ -57,15 +57,26 @@ func (f FileStorage) Delete(id string) error {
 }
 
 func (f FileStorage) GetFileList(folderPath string) ([]string, error) {
+	// Проверяем существование папки, если нет - создаем
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		err := os.MkdirAll(folderPath, 0o755)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Читаем содержимое папки
 	fileInfos, err := os.ReadDir(folderPath)
 	if err != nil {
 		return nil, err
 	}
 
+	// Создаем слайс для хранения имен файлов
 	filenames := make([]string, 0, len(fileInfos))
 
+	// Проходим по всем элементам в папке
 	for _, fileInfo := range fileInfos {
-		if !fileInfo.IsDir() {
+		if !fileInfo.IsDir() { // Проверяем, не является ли текущий элемент папкой
 			filenames = append(filenames, fileInfo.Name())
 		}
 	}

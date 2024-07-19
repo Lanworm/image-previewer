@@ -1,6 +1,6 @@
 server:
   http:
-    host: localhost
+    host: 0.0.0.0
     port: 8090
     timeout: 3s
 logger:
