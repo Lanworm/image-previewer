@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -49,7 +50,7 @@ var (
 )
 
 func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img image.Image, err error) {
-	imageID := getURLHash(imgParams.URL)
+	imageID := getURLHash("resize" + strconv.Itoa(imgParams.Width) + strconv.Itoa(imgParams.Height) + imgParams.URL)
 
 	// Проверяем наличие изображения в кэше
 	cachedImg, ok := s.cache.Get(lrucache.Key(imageID))
