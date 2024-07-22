@@ -2,12 +2,10 @@ package httphandler
 
 import (
 	"bytes"
-	"encoding/json"
 	"image/jpeg"
 	"net/http"
 	"strconv"
 
-	"github.com/Lanworm/image-previewer/internal/http/server/dto"
 	"github.com/Lanworm/image-previewer/internal/logger"
 	"github.com/Lanworm/image-previewer/internal/service"
 )
@@ -33,13 +31,14 @@ func (h *Handler) ResizeHandler(
 ) {
 	imgParams, err := service.PrepareImgParams(r)
 	if err != nil {
-		writeError(http.StatusInternalServerError, w, err.Error())
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		h.logger.Error(err.Error())
 		return
 	}
-	img, err := h.service.ResizeImg(imgParams)
+
+	img, err := h.service.ResizeImg(imgParams, r)
 	if err != nil {
-		writeError(http.StatusInternalServerError, w, err.Error())
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		h.logger.Error(err.Error())
 		return
 	}
@@ -47,31 +46,12 @@ func (h *Handler) ResizeHandler(
 	buf := new(bytes.Buffer)
 	encodeErr := jpeg.Encode(buf, img, nil)
 
-	for key, values := range r.Header {
-		for _, value := range values {
-			w.Header().Set(key, value)
-		}
-	}
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 	if encodeErr != nil {
-		writeError(http.StatusInternalServerError, w, encodeErr.Error())
+		http.Error(w, http.StatusText(http.StatusBadGateway), http.StatusBadGateway)
 		h.logger.Error(encodeErr.Error())
 		return
 	}
 	w.Write(buf.Bytes())
-}
-
-func writeError(
-	statusCode int,
-	w http.ResponseWriter,
-	msg string,
-) {
-	js, err := json.Marshal(dto.Result{Message: msg})
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(statusCode)
-		w.Write(js)
-	}
 }

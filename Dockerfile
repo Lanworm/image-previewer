@@ -1,5 +1,5 @@
 # Собираем в гошке
-FROM golang:1.19 as build
+FROM golang:1.22 as build
 
 ENV BIN_FILE /opt/previewer/previewer-app
 ENV CODE_DIR /go/src/

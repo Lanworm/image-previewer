@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"image"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	lrucache "github.com/Lanworm/image-previewer/internal/cache"
+	"github.com/Lanworm/image-previewer/internal/http/client"
 	"github.com/Lanworm/image-previewer/internal/logger"
 	"github.com/Lanworm/image-previewer/internal/storage"
 	"github.com/nfnt/resize"
@@ -46,42 +46,50 @@ var (
 	ErrImageNotFound  = errors.New("image not found on remote server")
 	ErrTargetNotImage = errors.New("requested URL does not point to an image")
 	ErrImageSize      = errors.New("image size exceeds the limit")
-	ErrOutOfBounds    = errors.New("image is out of bounds")
 )
 
-func (s *ImageService) ResizeImg(imgParams *ImgParams) (img image.Image, err error) {
+func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img image.Image, err error) {
 	imageID := getURLHash(imgParams.URL)
 
 	// Проверяем наличие изображения в кэше
-	sourceImg, ok := s.cache.Get(lrucache.Key(imageID))
+	cachedImg, ok := s.cache.Get(lrucache.Key(imageID))
 
 	// Если изображение найдено в кэше, отдаем его
 	if ok {
 		fmt.Println("received from cache: ", imageID)
-		cachedImg := resize.Resize(uint(imgParams.Width), uint(imgParams.Height), sourceImg, resize.Lanczos3)
 		return cachedImg, nil
 	}
 
 	// Если изображение не найдено в кэше, загружаем его
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", imgParams.URL, nil)
+	sourceImg, err := s.getImage(imgParams.URL, r)
+	if err != nil {
+		return nil, err
+	}
+	// Изменяем размер
+	resizedImg := resize.Resize(uint(imgParams.Width), uint(imgParams.Height), sourceImg, resize.Lanczos3)
+
+	// Кладем измененное изображение в кеш
+	s.cache.Set(lrucache.Key(imageID), resizedImg)
+
+	// Записываем измененное изображение в хранилище
+	err = s.storage.Set(resizedImg, imageID)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	return resizedImg, nil
+}
 
-	req = req.WithContext(ctx)
+func (s *ImageService) getImage(imgURL string, r *http.Request) (image.Image, error) {
+	HTTPClient := client.NewHTTPClient(5 * time.Second)
 
-	resp, err := client.Do(req)
+	resp, err := HTTPClient.DoRequest("GET", imgURL, nil, r.Header)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
 	// Проверяем статус ответа
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode == 404 {
 		return nil, ErrImageNotFound
 	}
 
@@ -95,29 +103,12 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams) (img image.Image, err err
 		return nil, ErrImageSize
 	}
 
-	fmt.Println("Downloaded from URL:", imgParams.URL)
+	fmt.Println("Downloaded from URL:", imgURL)
 	// Читаем изображение
-	sourceImg, _, err = image.Decode(resp.Body)
+	sourceImg, _, err := image.Decode(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	// Проверка размеров изображения и параметров ширины и высоты
-	bounds := sourceImg.Bounds()
-	imgWidth := bounds.Max.X
-	imgHeight := bounds.Max.Y
-
-	if imgWidth <= imgParams.Width && imgHeight <= imgParams.Width {
-		return nil, ErrOutOfBounds
-	}
-
-	s.cache.Set(lrucache.Key(imageID), sourceImg)
-	newImg := resize.Resize(uint(imgParams.Width), uint(imgParams.Height), sourceImg, resize.Lanczos3)
-
-	err = s.storage.Set(newImg, imageID)
-	if err != nil {
-		return nil, err
-	}
-
-	return newImg, nil
+	return sourceImg, nil
 }

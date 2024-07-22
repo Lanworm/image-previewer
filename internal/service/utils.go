@@ -26,11 +26,12 @@ func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
 	imageURL := vars["url"]
 
 	// Удаляем "https/" из URL, если присутствует
+	imageURL = strings.ReplaceAll(imageURL, "http:/", "")
 	imageURL = strings.ReplaceAll(imageURL, "https:/", "")
 
 	// Добавляем 'https://' в URL, если отсутствует
 	if !strings.HasPrefix(imageURL, "http://") && !strings.HasPrefix(imageURL, "https://") {
-		imageURL = "https://" + imageURL
+		imageURL = "http://" + imageURL
 	}
 
 	// Удаляем лишний символ '/' в конце URL изображения
@@ -41,7 +42,7 @@ func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
 	if err != nil {
 		return nil, ErrInvalidURL
 	}
-
+	// Создаем новую структуру с параметрами
 	params, err := NewImgParams(width, height, imageURL)
 	if err != nil {
 		return nil, ErrInvalidFormatOfArguments
@@ -52,7 +53,7 @@ func PrepareImgParams(r *http.Request) (imgParams *ImgParams, err error) {
 func NewImgParams(width string, height string, url string) (*ImgParams, error) {
 	w, errw := strconv.Atoi(width)
 	h, errh := strconv.Atoi(height)
-
+	//
 	if errw != nil || errh != nil {
 		return nil, ErrInvalidArgumentTypeOfWidthOrHeight
 	}
