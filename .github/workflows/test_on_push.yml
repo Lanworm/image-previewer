@@ -52,11 +52,19 @@ jobs:
       - name: Build Docker images
         run: docker-compose -f docker-compose.yml build
 
+      - name: Check for file existence
+        run: |
+          docker-compose -f docker-compose.yml up -d int-tests
+          # Проверка наличия файла внутри контейнера
+          docker-compose -f docker-compose.yml exec -T int-tests sh -c "if [ -f /int_test/test_files/image1.jpg ]; then echo 'File exists'; else echo 'File does not exist'; exit 1; fi"
+          docker-compose -f docker-compose.yml down
+
       - name: Run integration tests
         run: |
           docker-compose -f docker-compose.yml up -d int-tests
           docker-compose -f docker-compose.yml exec -T int-tests go test ./... -v
           docker-compose -f docker-compose.yml down
+          
 
 
   build:

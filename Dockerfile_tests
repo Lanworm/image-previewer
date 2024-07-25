@@ -13,7 +13,8 @@ RUN go mod download
 
 # Копируем все файлы в контейнер
 COPY . .
-
+# Копируем тестовые файлы в каталог /images
+COPY ./int_test/test_files /int_test/test_files
 # Устанавливаем рабочую директорию для тестов
 WORKDIR /app/int_test
 
