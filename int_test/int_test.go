@@ -64,7 +64,7 @@ func TestImageFoundInCache(t *testing.T) {
 
 // RemoveFile удаляет указанный файл из директории int_test/test_files.
 func RemoveFile(fileName string) error {
-	filePath := fmt.Sprintf("int_test/test_files/%s", fileName) // Полный путь к файлу
+	filePath := fmt.Sprintf("/int_test/test_files/%s", fileName) // Полный путь к файлу
 
 	// Удаляем файл
 	if err := os.Remove(filePath); err != nil {
@@ -74,6 +74,32 @@ func RemoveFile(fileName string) error {
 	return nil // Возвращаем nil, если файл успешно удален
 }
 
+func RestoreFile(fileName string) error {
+	srcFilePath := fmt.Sprintf("/int_test/backup_files/%s", fileName) // Путь к резервной копии файла
+	dstFilePath := fmt.Sprintf("/int_test/test_files/%s", fileName)   // Путь, куда восстанавливаем файл
+
+	// Открываем файл из резервной копии
+	srcFile, err := os.Open(srcFilePath)
+	if err != nil {
+		return fmt.Errorf("ошибка при открытии резервного файла %s: %w", srcFilePath, err)
+	}
+	defer srcFile.Close()
+
+	// Создаем файл в целевой директории
+	dstFile, err := os.Create(dstFilePath)
+	if err != nil {
+		return fmt.Errorf("ошибка при создании файла %s: %w", dstFilePath, err)
+	}
+	defer dstFile.Close()
+
+	// Копируем содержимое из резервного файла в целевой файл
+	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		return fmt.Errorf("ошибка при копировании файла из %s в %s: %w", srcFilePath, dstFilePath, err)
+	}
+
+	return nil // Возвращаем nil, если файл успешно восстановлен
+}
+
 func IsRunningInContainer() bool {
 	_, err := os.Stat("/proc/1/cgroup")
 	return !os.IsNotExist(err)
@@ -81,17 +107,20 @@ func IsRunningInContainer() bool {
 
 // GetImage делает HTTP-запрос для получения изображения по указанному пути.
 func GetImage(imagePath string) (*http.Response, error) {
-	var serviceURL string
+	var nginxURL string
+	var appURL string
 
 	// Определяем URL сервиса в зависимости от того, запущен ли код в контейнере.
 	if IsRunningInContainer() {
-		serviceURL = "previewer-web-nginx" // Используем имя сервиса в Docker.
+		nginxURL = "previewer-web-nginx" // Используем имя сервиса в Docker.
+		appURL = "app"
 	} else {
-		serviceURL = "localhost" // Используем localhost для локальной разработки.
+		nginxURL = "localhost" // Используем localhost для локальной разработки.
+		appURL = "localhost"
 	}
 
 	// Формируем базовый URL для запроса.
-	baseURL := fmt.Sprintf("http://localhost:8090/fill/200/300/%s:3080/images/%s", serviceURL, imagePath)
+	baseURL := fmt.Sprintf("http://%s:8090/fill/200/300/%s:3080/images/%s", appURL, nginxURL, imagePath)
 
 	// Создаем HTTP-клиент с таймаутом в 10 секунд.
 	HTTPClient := client.NewHTTPClient(10 * time.Second)
