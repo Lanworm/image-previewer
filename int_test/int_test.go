@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"testing"
 	"time"
 
@@ -38,7 +37,7 @@ func TestImageFoundInCache(t *testing.T) {
 	}
 
 	// Удаляем файл из контейнера
-	err = RemoveFileFromDocker(imagePath)
+	err = RemoveFile(imagePath)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -63,27 +62,16 @@ func TestImageFoundInCache(t *testing.T) {
 	assert.True(t, bytes.Equal(expectedImageContents, actualImageContents), "Полученное изображение из кэша не совпадает с эталонным.")
 }
 
-func RemoveFileFromDocker(imagePath string) error {
-	// Команда для удаления файла из контейнера
-	cmd := exec.Command("docker-compose", "exec", "nginx", "rm", "/usr/share/nginx/html/images/"+imagePath)
+// RemoveFile удаляет указанный файл из директории int_test/test_files.
+func RemoveFile(fileName string) error {
+	filePath := fmt.Sprintf("int_test/test_files/%s", fileName) // Полный путь к файлу
 
-	// Выполняем команду
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("ошибка при удалении файла: %w", err)
+	// Удаляем файл
+	if err := os.Remove(filePath); err != nil {
+		return fmt.Errorf("ошибка при удалении файла %s: %w", filePath, err)
 	}
 
-	// Проверка, что файл был успешно удален
-	checkCmd := exec.Command("docker-compose", "exec", "nginx", "ls", "/usr/share/nginx/html/images")
-	output, err := checkCmd.Output()
-	if err != nil {
-		return fmt.Errorf("ошибка при проверке наличия файла: %w", err)
-	}
-	// Преобразуем вывод в строку и проверяем, что файла нет в выводе
-	if string(output) == imagePath {
-		return fmt.Errorf("файл %s все еще существует после удаления", imagePath)
-	}
-	return nil
+	return nil // Возвращаем nil, если файл успешно удален
 }
 
 func IsRunningInContainer() bool {
