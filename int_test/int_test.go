@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -15,6 +16,17 @@ import (
 	"github.com/Lanworm/image-previewer/internal/http/server/dto"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestPrintDirTree(t *testing.T) {
+	root, err := os.Getwd() // Получаем текущую рабочую директорию
+	if err != nil {
+		t.Fatalf("ошибка при получении рабочей директории: %v", err)
+	}
+
+	if err := printDirTree(root, ""); err != nil {
+		t.Errorf("ошибка при выводе дерева директорий: %v", err)
+	}
+}
 
 // Картинка найдена в кэше.
 func TestImageFoundInCache(t *testing.T) {
@@ -64,7 +76,7 @@ func TestImageFoundInCache(t *testing.T) {
 
 // RemoveFile удаляет указанный файл из директории int_test/test_files.
 func RemoveFile(fileName string) error {
-	filePath := fmt.Sprintf("/int_test/test_files/%s", fileName) // Полный путь к файлу
+	filePath := fmt.Sprintf("/test_files/%s", fileName) // Полный путь к файлу
 
 	// Удаляем файл
 	if err := os.Remove(filePath); err != nil {
@@ -72,32 +84,6 @@ func RemoveFile(fileName string) error {
 	}
 
 	return nil // Возвращаем nil, если файл успешно удален
-}
-
-func RestoreFile(fileName string) error {
-	srcFilePath := fmt.Sprintf("/int_test/backup_files/%s", fileName) // Путь к резервной копии файла
-	dstFilePath := fmt.Sprintf("/int_test/test_files/%s", fileName)   // Путь, куда восстанавливаем файл
-
-	// Открываем файл из резервной копии
-	srcFile, err := os.Open(srcFilePath)
-	if err != nil {
-		return fmt.Errorf("ошибка при открытии резервного файла %s: %w", srcFilePath, err)
-	}
-	defer srcFile.Close()
-
-	// Создаем файл в целевой директории
-	dstFile, err := os.Create(dstFilePath)
-	if err != nil {
-		return fmt.Errorf("ошибка при создании файла %s: %w", dstFilePath, err)
-	}
-	defer dstFile.Close()
-
-	// Копируем содержимое из резервного файла в целевой файл
-	if _, err := io.Copy(dstFile, srcFile); err != nil {
-		return fmt.Errorf("ошибка при копировании файла из %s в %s: %w", srcFilePath, dstFilePath, err)
-	}
-
-	return nil // Возвращаем nil, если файл успешно восстановлен
 }
 
 func IsRunningInContainer() bool {
@@ -147,6 +133,23 @@ func GetImage(imagePath string) (*http.Response, error) {
 
 	// Возвращаем полученный ответ, если все прошло успешно.
 	return resp, nil
+}
+func printDirTree(root string, indent string) error {
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		fmt.Println(indent + entry.Name())
+		if entry.IsDir() {
+			newPath := filepath.Join(root, entry.Name())
+			if err := printDirTree(newPath, indent+"  "); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // Дополнительные тесты для других сценариев...
