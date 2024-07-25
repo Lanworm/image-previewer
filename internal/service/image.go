@@ -82,7 +82,7 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img ima
 }
 
 func (s *ImageService) getImage(imgURL string, r *http.Request) (image.Image, error) {
-	HTTPClient := client.NewHTTPClient(5 * time.Second)
+	HTTPClient := client.NewHTTPClient(10 * time.Second)
 
 	resp, err := HTTPClient.DoRequest("GET", imgURL, nil, r.Header)
 	if err != nil {
