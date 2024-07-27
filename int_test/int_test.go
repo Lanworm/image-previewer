@@ -134,6 +134,7 @@ func GetImage(imagePath string) (*http.Response, error) {
 	// Возвращаем полученный ответ, если все прошло успешно.
 	return resp, nil
 }
+
 func printDirTree(root string, indent string) error {
 	entries, err := os.ReadDir(root)
 	if err != nil {
