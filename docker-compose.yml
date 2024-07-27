@@ -35,6 +35,7 @@ services:
     depends_on:
       - app
       - nginx
+    command: ["tail", "-f", "/dev/null"]
 
 
 

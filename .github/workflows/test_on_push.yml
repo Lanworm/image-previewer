@@ -55,7 +55,7 @@ jobs:
       - name: Run integration tests
         run: |
           docker-compose -f docker-compose.yml up -d int-tests
-          docker-compose -f docker-compose.yml exec -T int-tests go test ./... -v
+          docker-compose -f docker-compose.yml exec -T int-tests go test ./int_test/ -v
           docker-compose -f docker-compose.yml down
 
   build:
