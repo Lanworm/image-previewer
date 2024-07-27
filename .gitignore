@@ -4,3 +4,4 @@ images/
 test_images
 .github
 .idea
+.pre-commit-config.yaml

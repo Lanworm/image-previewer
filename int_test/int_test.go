@@ -76,7 +76,7 @@ func TestImageFoundInCache(t *testing.T) {
 
 // RemoveFile удаляет указанный файл из директории int_test/test_files.
 func RemoveFile(fileName string) error {
-	filePath := fmt.Sprintf("/test_files/%s", fileName) // Полный путь к файлу
+	filePath := fmt.Sprintf("./test_files/%s", fileName) // Полный путь к файлу
 
 	// Удаляем файл
 	if err := os.Remove(filePath); err != nil {

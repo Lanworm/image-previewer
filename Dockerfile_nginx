@@ -1,6 +1,8 @@
 # Используем официальный образ Nginx
 FROM nginx:latest
 
+# Копируем тестовые файлы в каталог /images
+COPY ./int_test/test_files /usr/share/nginx/html/images
 
 # Копируем конфигурационный файл Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
