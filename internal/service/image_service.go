@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -44,12 +45,14 @@ type ImgParams struct {
 }
 
 var (
-	ErrImageNotFound  = errors.New("image not found on remote server")
-	ErrTargetNotImage = errors.New("requested URL does not point to an image")
-	ErrImageSize      = errors.New("image size exceeds the limit")
+	ErrImageNotFound      = errors.New("image not found on remote server")
+	ErrTargetNotImage     = errors.New("target file is not an image")
+	ErrImageSize          = errors.New("image size exceeds the limit")
+	ErrServerDoesNotExist = errors.New("remote server does not exist")
 )
 
 func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img image.Image, err error) {
+	// Получаем уникальный идентификатор изображения на основе его ссылки и размеров для изменения
 	imageID := getURLHash("resize" + strconv.Itoa(imgParams.Width) + strconv.Itoa(imgParams.Height) + imgParams.URL)
 
 	// Проверяем наличие изображения в кэше
@@ -66,6 +69,7 @@ func (s *ImageService) ResizeImg(imgParams *ImgParams, r *http.Request) (img ima
 	if err != nil {
 		return nil, err
 	}
+
 	// Изменяем размер
 	resizedImg := resize.Resize(uint(imgParams.Width), uint(imgParams.Height), sourceImg, resize.Lanczos3)
 
@@ -86,9 +90,15 @@ func (s *ImageService) getImage(imgURL string, r *http.Request) (image.Image, er
 
 	resp, err := HTTPClient.DoRequest("GET", imgURL, nil, r.Header)
 	if err != nil {
+		fmt.Println(err.Error())
+		var dnsErr *net.DNSError
+		if errors.As(err, &dnsErr) {
+			return nil, ErrServerDoesNotExist
+		}
 		return nil, err
 	}
 	defer resp.Body.Close()
+
 	// Проверяем статус ответа
 	if resp.StatusCode == 404 {
 		return nil, ErrImageNotFound

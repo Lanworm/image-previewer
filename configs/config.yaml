@@ -2,7 +2,7 @@ server:
   http:
     host: 0.0.0.0
     port: 8090
-    timeout: 3s
+    timeout: 10s
 logger:
   level: DEBUG
 cache:
