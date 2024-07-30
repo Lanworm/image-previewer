@@ -37,10 +37,13 @@ func TestImageFoundInCache(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	// Удаляем файл из контейнера
-	err = RemoveFile(imagePath)
-	if err != nil {
-		t.Fatal(err.Error())
+	// Проверяем что тест запущен в контейнере
+	if IsRunningInContainer() {
+		// Удаляем файл из общей папки Nginx и тестов (этот шаг пропускается при локальном запуске)
+		err = RemoveFile(imagePath)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
 	}
 
 	// Запрашиваем картинку с сервера повторно
@@ -67,7 +70,7 @@ func TestImageFoundInCache(t *testing.T) {
 func TestRemoteServerDoesNotExist(t *testing.T) {
 	imagePath := "image1.jpg"
 
-	// Запрашиваем картинку с сервера
+	// Запрашиваем картинку с сервера, который не существует
 	resp, err := GetImage(imagePath, "300", "400", "http://NotExistHost")
 
 	// Проверяем, что ошибка не равна nil
@@ -113,7 +116,7 @@ func TestImageNotFound(t *testing.T) {
 func TestFileIsNotAnImage(t *testing.T) {
 	imagePath := "image.exe"
 
-	// Запрашиваем файл с сервера, который существует
+	// Запрашиваем файл с сервера
 	resp, err := GetImage(imagePath, "400", "300", "")
 
 	// Проверяем, что ошибка не равна nil
@@ -122,6 +125,29 @@ func TestFileIsNotAnImage(t *testing.T) {
 	if err != nil {
 		// Проверяем, что текст ошибки содержит "target file is not an image"
 		assert.Contains(t, err.Error(), service.ErrTargetNotImage.Error(), "unexpected error message")
+		return
+	}
+
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+
+	t.Fatal("expected error, but got none")
+}
+
+// Запрашиваемый файл превышает допустимый размер.
+func TestFileTooLarge(t *testing.T) {
+	imagePath := "TooLargeImage.jpg"
+
+	// Запрашиваем с сервера файл размер которого превышает указанные в конфигурации приложения
+	resp, err := GetImage(imagePath, "400", "300", "")
+
+	// Проверяем, что ошибка не равна nil
+	assert.NotNil(t, err, "expected an error, but got none")
+
+	if err != nil {
+		// Проверяем, что текст ошибки содержит "image size exceeds the limit"
+		assert.Contains(t, err.Error(), service.ErrImageSize.Error(), "unexpected error message")
 		return
 	}
 
@@ -176,7 +202,7 @@ func GetImage(imgPath string, imgH string, imgW string, hostPath string) (*http.
 	baseURL := fmt.Sprintf("http://%s:8090/fill/%s/%s/%s:3080/images/%s", appURL, imgH, imgW, nginxURL, imgPath)
 
 	// Создаем HTTP-клиент с таймаутом в 10 секунд.
-	HTTPClient := client.NewHTTPClient(50 * time.Second)
+	HTTPClient := client.NewHTTPClient(10 * time.Second)
 
 	// Выполняем GET-запрос по сформированному URL.
 	resp, err := HTTPClient.DoRequest("GET", baseURL, nil, nil)

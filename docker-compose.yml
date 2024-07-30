@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Сервис приложения
   app:
     build:
       context: .
@@ -11,6 +12,7 @@ services:
     networks:
       - test-network
 
+  # Сервис Nginx
   nginx:
     build:
       context: .
@@ -23,6 +25,7 @@ services:
     networks:
       - test-network
 
+  # Сервис для интеграционных тестов
   int-tests:
     build:
       context: .
@@ -33,14 +36,14 @@ services:
     networks:
       - test-network
     depends_on:
-      - app
-      - nginx
-    command: ["tail", "-f", "/dev/null"]
+      - app  # Зависимость от сервиса приложения
+      - nginx # Зависимость от сервиса Nginx
+    command: ["tail", "-f", "/dev/null"] # Команда для удержания контейнера в активном состоянии
 
-
-
+# Определение общей сети для всех сервисов
 networks:
   test-network:
 
+# Определение общего тома для обмена данными между сервисами
 volumes:
   shared_volume:
