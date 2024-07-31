@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
+// Client структура.
 type Client struct {
 	client *http.Client
 }
 
+// NewHTTPClient функция для создания нового HTTP клиента.
 func NewHTTPClient(timeout time.Duration) *Client {
 	return &Client{
 		client: &http.Client{
